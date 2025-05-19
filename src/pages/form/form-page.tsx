@@ -1,13 +1,18 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
-import { Box, Button, Container, Paper, TextField, Typography } from "@mui/material";
+import { Box, Button, Container, Paper, Typography } from "@mui/material";
 import { Autocomplete } from "../../components/autocomplete.tsx";
 import { getProfessions, type GetProfessionsResponse } from "../../api/get-professions.ts";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { ptBR } from "date-fns/locale";
+import { format } from "date-fns";
 
 type FormData = {
   professionId: number | null;
-  date: string | null;
+  date: Date | null;
 };
 
 export function FormPage() {
@@ -36,7 +41,10 @@ export function FormPage() {
   });
 
   function onSubmit(data: FormData) {
-    console.log(data);
+    console.log({
+      profissao: data.professionId,
+      data: format(data.date!, "yyyy-MM-dd"),
+    });
   }
 
   function onQueryDispatch(inputSearch: string) {
@@ -64,53 +72,60 @@ export function FormPage() {
           <Typography variant="h5" component="h1" gutterBottom fontWeight={700}>
             Formulário
           </Typography>
-          <Box component="form" onSubmit={form.handleSubmit(onSubmit)} noValidate sx={{ mt: 2 }}>
-            <Controller
-              name="professionId"
-              control={form.control}
-              defaultValue={null}
-              rules={{ required: "Este campo é obrigatório" }}
-              render={({ field, fieldState }) => (
-                <Autocomplete
-                  label="Profissão"
-                  value={field.value}
-                  search={professionSearch}
-                  isLoading={professionsQuery.isFetching}
-                  isFetched={professionsQuery.isFetched}
-                  items={professions}
-                  onSelectChange={field.onChange}
-                  errorMessage={fieldState.error?.message}
-                  dispatchQuery={onQueryDispatch}
-                />
-              )}
-            />
-            <Controller
-              name="date"
-              control={form.control}
-              rules={{ required: "Este campo é obrigatório" }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Data"
-                  type="date"
-                  fullWidth
-                  margin="normal"
-                  slotProps={{ inputLabel: { shrink: true } }}
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              sx={{ mt: 3, textTransform: "none", fontWeight: "bold" }}
-            >
-              Enviar
-            </Button>
-          </Box>
+          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
+            <Box component="form" onSubmit={form.handleSubmit(onSubmit)} noValidate sx={{ mt: 2 }}>
+              <Controller
+                name="professionId"
+                control={form.control}
+                defaultValue={null}
+                rules={{ required: "Este campo é obrigatório" }}
+                render={({ field, fieldState }) => (
+                  <Autocomplete
+                    label="Profissão"
+                    value={field.value}
+                    search={professionSearch}
+                    isLoading={professionsQuery.isFetching}
+                    isFetched={professionsQuery.isFetched}
+                    items={professions}
+                    onSelectChange={field.onChange}
+                    errorMessage={fieldState.error?.message}
+                    dispatchQuery={onQueryDispatch}
+                  />
+                )}
+              />
+              <Controller
+                name="date"
+                control={form.control}
+                defaultValue={null}
+                rules={{ required: "Este campo é obrigatório" }}
+                render={({ field, fieldState }) => (
+                  <DatePicker
+                    label="Data"
+                    value={field.value}
+                    onChange={field.onChange}
+                    sx={{ ".MuiButtonBase-root": { marginRight: 0 } }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        margin: "normal",
+                        error: !!fieldState.error,
+                        helperText: fieldState.error?.message,
+                      },
+                    }}
+                  />
+                )}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{ mt: 3, textTransform: "none", fontWeight: "bold" }}
+              >
+                Enviar
+              </Button>
+            </Box>
+          </LocalizationProvider>
         </Paper>
       </Container>
     </Box>

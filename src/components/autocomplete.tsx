@@ -91,7 +91,7 @@ export function Autocomplete(props: AutocompleteProps) {
   }
 
   function onFieldFocus() {
-    if (!isSelectOpen && props.search.length > 0) {
+    if (!isSelectOpen && props.search.length > 0 && props.value === null) {
       setIsSelectOpen(true);
     }
   }
@@ -112,6 +112,7 @@ export function Autocomplete(props: AutocompleteProps) {
         fullWidth
         onFocus={onFieldFocus}
         margin="normal"
+        autoComplete="off"
         onBlur={onFieldBlur}
         onChange={onFieldChange}
         error={!!props.errorMessage}
