@@ -1,21 +1,53 @@
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import { Box, Button, Container, Paper, TextField, Typography } from "@mui/material";
+import { Autocomplete } from "../../components/autocomplete.tsx";
+import { getProfessions, type GetProfessionsResponse } from "../../api/get-professions.ts";
 
-interface FormData {
-  professionId: string;
-  date: string;
-}
+type FormData = {
+  professionId: number | null;
+  date: string | null;
+};
 
 export function FormPage() {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>();
+  const form = useForm<FormData>();
+  const [professionSearch, setProfessionSearch] = useState("");
+
+  const professionsQuery = useQuery<
+    GetProfessionsResponse,
+    Error,
+    Array<{ id: number; label: string }>,
+    [string, { profession: string }]
+  >({
+    enabled: professionSearch.length > 0,
+    queryKey: ["professions", { profession: professionSearch }],
+    async queryFn({ queryKey }) {
+      const profession = queryKey[1].profession.split("-")[0];
+      return new Promise((resolve) => setTimeout(() => resolve(getProfessions({ profession })), 1000));
+    },
+    placeholderData: (previousData) => previousData ?? [],
+    select(data) {
+      return data.map((profession) => ({
+        id: profession.id,
+        label: profession.profissao_pessoa,
+      }));
+    },
+  });
 
   function onSubmit(data: FormData) {
     console.log(data);
   }
+
+  function onQueryDispatch(inputSearch: string) {
+    if (inputSearch.length > 0) {
+      setProfessionSearch(inputSearch + "-" + Date.now());
+    } else {
+      setProfessionSearch(inputSearch);
+    }
+  }
+
+  const professions = professionsQuery.data ?? [];
 
   return (
     <Box bgcolor="#f8f9fa" component="main">
@@ -32,27 +64,31 @@ export function FormPage() {
           <Typography variant="h5" component="h1" gutterBottom fontWeight={700}>
             Formulário
           </Typography>
-          <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 2 }}>
+          <Box component="form" onSubmit={form.handleSubmit(onSubmit)} noValidate sx={{ mt: 2 }}>
             <Controller
               name="professionId"
-              control={control}
+              control={form.control}
+              defaultValue={null}
               rules={{ required: "Este campo é obrigatório" }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
+              render={({ field, fieldState }) => (
+                <Autocomplete
                   label="Profissão"
-                  fullWidth
-                  margin="normal"
-                  error={!!errors.professionId}
-                  helperText={errors.professionId?.message}
+                  value={field.value}
+                  search={professionSearch}
+                  isLoading={professionsQuery.isFetching}
+                  isFetched={professionsQuery.isFetched}
+                  items={professions}
+                  onSelectChange={field.onChange}
+                  errorMessage={fieldState.error?.message}
+                  dispatchQuery={onQueryDispatch}
                 />
               )}
             />
             <Controller
               name="date"
-              control={control}
+              control={form.control}
               rules={{ required: "Este campo é obrigatório" }}
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <TextField
                   {...field}
                   label="Data"
@@ -60,8 +96,8 @@ export function FormPage() {
                   fullWidth
                   margin="normal"
                   slotProps={{ inputLabel: { shrink: true } }}
-                  error={!!errors.date}
-                  helperText={errors.date?.message}
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
                 />
               )}
             />
