@@ -1,54 +1,90 @@
-# React + TypeScript + Vite
+# React Autocomplete
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React application that demonstrates a custom autocomplete component with debounced search functionality. The application includes a form with an autocomplete field for selecting professions and a date picker.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Custom autocomplete component with debounced search
+- Form validation using React Hook Form
+- Data fetching with React Query
+- Material UI for styling
+- Mock API using json-server
 
-## Expanding the ESLint configuration
+## Main Dependencies
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- React 19
+- TypeScript
+- Vite
+- Material UI
+- React Query
+- React Hook Form
+- json-server (for mock API)
+- use-debounce
+- date-fns
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Getting Started
+
+### Prerequisites
+
+- Node.js (latest LTS version recommended)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+
+```bash
+npm install
+# or
+yarn
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Running the Application
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. Start the mock API server:
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+npm run server
+# or
+yarn server
 ```
+
+2. In a separate terminal, start the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+```
+
+3. Open your browser and navigate to the URL shown in the terminal (typically http://localhost:5173)
+
+### Building for Production
+
+```bash
+npm run build
+# or
+yarn build
+```
+
+## Environment Variables
+
+The application uses the following environment variables:
+
+- `VITE_BASE_API_URI`: The base URL for the json-server mock API (default: http://127.0.0.1:3000)
+
+## Project Structure
+
+- `src/components/`: React components, including the custom autocomplete component
+- `src/pages/`: Application pages
+- `src/api/`: API client functions
+- `src/server/`: Mock API data
+
+## Available Scripts
+
+- `dev`: Runs the development server with Vite
+- `build`: Compiles TypeScript and builds the project
+- `lint`: Runs ESLint
+- `server`: Runs json-server with a local database file
+- `preview`: Previews the built application
